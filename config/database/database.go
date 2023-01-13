@@ -17,5 +17,5 @@ func ConfigDatabase() {
 		panic(err)
 	}
 	DB.Logger= logger.Default.LogMode(logger.Info)
-	DB.AutoMigrate(&models.User{})
+	DB.AutoMigrate(&models.User{},&models.Folder{},&models.File{})
 }

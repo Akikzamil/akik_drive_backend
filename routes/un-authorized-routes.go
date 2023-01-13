@@ -9,7 +9,8 @@ import (
 
 func SetupUnAuthoriedRoutes(e *echo.Echo) {
 	e.GET("/",Welcome);
-	e.POST("/user",auth.SignUpUser)
+	e.POST("/signUp",auth.SignUpUser)
+	e.POST("/login",auth.Login)
 }
 
 func Welcome(c echo.Context) error{

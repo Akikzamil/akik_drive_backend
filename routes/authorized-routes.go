@@ -2,6 +2,6 @@ package routes
 
 import "github.com/labstack/echo/v4"
 
-func SetupAuthorizedRoutes(e *echo.Echo) {
+func SetupAuthorizedRoutes(e *echo.Group) {
 
 }

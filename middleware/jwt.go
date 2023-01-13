@@ -5,6 +5,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func SetupJwt(e *echo.Echo) {
+func SetupJwt(e *echo.Group) {
 	e.Use(echojwt.JWT([]byte("secret")))
 }
