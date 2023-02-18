@@ -36,7 +36,7 @@ func Login(c echo.Context) error {
 	user := new(models.User)
 	user2 := new(models.User)
 	if err := c.Bind(user); err != nil {
-		return c.String(503, "Invalid Data")
+		return c.String(503, err.Error())
 	}
 	result := database.DB.Where("email=?", user.Email).First(&user2)
 	if result.RowsAffected == 0 {
@@ -47,8 +47,7 @@ func Login(c echo.Context) error {
 	}
 	t := getToken(user)
 
-	return c.JSON(http.StatusCreated, echo.Map{"token": t})
-
+	return c.JSON(http.StatusOK, echo.Map{"token": t})
 }
 
 func getToken(user *models.User) string {

@@ -12,9 +12,6 @@ import (
 
 func SetupRoutes(e *echo.Echo) {
 	middleware.InitialiseCommonMiddlewares(e)
-	e.GET("/kk", func(c echo.Context) error {
-		return c.File("assets/ll.png")
-	})
 	e.POST("/ll", upload)
 	SetupUnAuthoriedRoutes(e)
 	r := e.Group("/restricted")
