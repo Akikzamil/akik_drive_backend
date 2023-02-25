@@ -15,6 +15,7 @@ func SetupAuthorizedRoutes(e *echo.Group) {
 	e.POST("/folder",folder.CreateFolder)
 	e.DELETE("/folder/:id",folder.DeleteFolder)
 	e.POST("/file",file.UploadAFile)
+	e.POST("/files",file.UploadFiles)
 	e.GET("/file/:id",file.GetFilesById)
 	e.DELETE("/file/:id",file.DeleteAFile)
 	e.GET("/",Welcome)

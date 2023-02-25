@@ -59,13 +59,23 @@ func DeleteAFile(c echo.Context) error {
 	database.DB.Where("id=?",id).First(&file)
 	err := os.Remove(fmt.Sprintf("assets/%s",file.Path))
 	if(err != nil){
-		return c.String(405,err.Error())
+		// return c.String(405,err.Error())
+		fmt.Println(err)
 	}
 	result := database.DB.Delete(&file, id)
 	if result.RowsAffected == 0 {
 		return c.NoContent(http.StatusNotFound)
 	}
 	return c.String(http.StatusOK, "Successfully Deleted")
+}
+
+func DeleteFilesByFolderId(id int){
+	var files []models.File
+	database.DB.Where("folder_id=?",id).Find(&files)
+	for _,file := range files{
+		os.Remove(fmt.Sprintf("assets/%s",file.Path))
+	}
+	database.DB.Where("folder_id=?",id).Delete(&files)
 }
 
 func GetFile(c echo.Context) error {
@@ -97,4 +107,41 @@ func generateOTP(length int) (string, error) {
     }
 
     return string(buffer), nil
+}
+
+
+func UploadFiles(c echo.Context) error {
+	folderId := c.FormValue("folder_id");
+	val ,_ := generateOTP(6);
+	folderIdInt, _ := strconv.Atoi(folderId)
+	form, err := c.MultipartForm()
+	if err != nil {
+		return err
+	}
+	files := form.File["files"]
+	 filesJson := []models.File{} 
+
+	for _,file := range files{
+		src, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+	
+		// Destination
+		dst, err := os.Create(fmt.Sprintf("assets/%s%s",val, file.Filename))
+		if err != nil {
+			return err
+		}
+		defer dst.Close()
+
+		if _, err = io.Copy(dst, src); err != nil {
+			return err
+		}
+	
+		fileData := models.File{Name: file.Filename,FolderId: folderIdInt,Path: fmt.Sprintf("/%s%s",val,file.Filename)}
+		filesJson = append(filesJson, fileData)
+	}
+	database.DB.Create(&filesJson)
+	return c.JSON(201,filesJson)
 }

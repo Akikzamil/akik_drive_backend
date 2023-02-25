@@ -2,8 +2,10 @@ package folder
 
 import (
 	"akik_drive/config/database"
+	"akik_drive/handlers/file"
 	"akik_drive/models"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -48,7 +50,20 @@ func DeleteFolder(c echo.Context) error {
 	if result.RowsAffected == 0 {
 		return c.NoContent(http.StatusNotFound)
 	}
+	intId, _ := strconv.Atoi(id)
+	deleteChildFolders(intId)
+	file.DeleteFilesByFolderId(intId)
 	return c.String(http.StatusOK, "Successfully Deleted")
+}
+
+func deleteChildFolders(id int){
+	var folders []models.Folder
+	database.DB.Where("parent_folder_id=?",id).Find(&folders)
+	for _,folder := range folders{
+		file.DeleteFilesByFolderId(int(folder.ID))
+		deleteChildFolders(int(folder.ID))
+	}
+	database.DB.Where("parent_folder_id=?",id).Delete(&folders)
 }
 
 func ImportDefaultFolder() {
